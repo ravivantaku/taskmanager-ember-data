@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Task Manager</title>
+    <link href="lib.min.css" rel="stylesheet"/>
+    <link href="all.min.css" rel="stylesheet"/>
+</head>
+<body>
+<div id="tm-app"></div>
+<script type="text/x-handlebars" id="application">
+	<header>
+		<nav class="nav navbar-inverse" role="navigation">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					{{#link-to 'index' class="navbar-brand"}}Technoidentity TaskManger{{/link-to}}
+				</div>
+				<ul class="nav navbar-nav navbar-right">
+					<li>{{#link-to 'tasks' this.id class='btn'}}Tasks{{/link-to}}</li>
+					<li>{{#link-to 'projects' this.id class='btn' }}Projects{{/link-to}}</li>
+					<li><div>
+						Welcome <b><span>{{userName}}</span></b>
+					</div></li>
+				</ul>
+			</div>
+		</nav>
+	</header>
+	<div>
+			<div class="col-md-12" style="margin-top:30px;">
+				{{outlet}}
+			</div>
+	</div>
+</script>
+<script type="text/x-handlebars" id="index">
+	 <!--<div class="well">-->
+		  <!--Display list of projects, Click {{#link-to 'projects' class="btn btn-success" }}Projects{{/link-to}}-->
+	  <!--</div>-->
+</script>
+<script type="text/x-handlebars" id="login">
+	<div class="row">
+		<div class="col-md-5 col-offset-4">
+			{{#if errorMessage}}
+			<div class="alert alert-danger alert-dismissible" role="alert">
+				<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				{{errorMessage}}
+			</div>
+			{{/if}}
+			<div class="well">
+				<form  method="post" {{action login on='submit'}}>
+				<fieldset>
+					<legend><h3 class="text-center"> Login</h3></legend>
+					<div class="form-group">
+						{{ input type='text' value= userName class='form-control text-sm' placeholder='User Name' required='required'}}
+					</div>
+					<div class="form-group">
+						{{ input type='password' value= password class='form-control text-sm' placeholder='Password' required='required'}}
+					</div>
+					<div class="form-group">
+						<button class="btn btn-primary" type="submit">Login</button>
+					</div>
+				</fieldset>
+				</form>
+			</div>
+		</div>
+	</div>
+</script>
+<script type="text/x-handlebars" id="users">
+	<div class="row">
+		<div class="col-md-5">
+			{{#link-to 'users.new'}}Create User{{/link-to}}
+			<div class="well">
+				<h4><b>Users List :</b></h4>
+				<ul class="list-group">
+					{{#each}}
+						{{#link-to 'user' this class='list-group-item'}}{{userName}}{{/link-to}}
+					{{/each}}
+				</ul>
+			</div>
+		</div>
+		<div class="col-md-7">
+			{{outlet}}
+		</div>
+	</div>
+</script>
+<script type="text/x-handlebars" id="users/new">
+	<form>
+		<div class="form-group">
+			<label for="userName" class="form-label">User Name :</label>
+			{{view Ember.TextField class='form-control' valueBinding="userName" id="userName" placeholder="User Name" required="true"}}
+		</div>
+		<div class="form-group">
+			<label for="location" class="form-label">Location :</label>
+			{{input type='text' name='location' id='location' class='form-control' value=location placeholder='Enter Location'}}
+		</div>
+		<div class="form-group">
+		<label class="label-control" for="email">Email :</label>
+			{{input type='email' name='email' id='email' class='form-control' value=email placeholder='Enter Email'}}
+		</div>
+		<div class="form-group">
+		<label for="phoneno" class="form-label">Phone No. :</label>
+		{{input type='text' name='phoneno' id='phoneno' class='form-control' value=phoneNumber placeholder='Enter Phone Number'}}
+		</div>
+		<div class="form-group">
+				<label class="label-control">Admin
+					<!--{{ input type="checkbox" name="admin" value='true' checked=isAdmin }}-->
+					{{input type='radio' name="admin" value='true' valueBinding='isAdmin'}}
+				</label>
+				<label class="label-control">Employer
+					<!--{{ input type="checkbox" name="admi" value='false' checked=isAdmi}}-->
+					{{input type='radio' name="admin" value='false' valueBinding='isAdmin'}}
+				</label>
+		</div>
+		<div class="form-group">
+			<input type="button" class='btn btn-primary' value="Create" {{action 'createUser'}}/>
+			<input type="reset" class="btn btn-primary" value="Cancel" {{action 'cancel'}}/>
+		</div>
+	</form>
+</script>
+<script type="text/x-handlebars" id="users/index">
+	<div>
+		Select any one!.
+	</div>
+</script>
+<script type="text/x-handlebars" id="user">
+	<div class="row">
+		<div class="col-md-3">
+			<div class="well">
+				<p class="text-center">
+				<h4><b>Name: </b>{{userName}}</h4>
+				</p>
+				<p>
+					<b>Ph.No :</b> {{phoneNumber}}<br/>
+					<b>Email :</b> {{email}}<br/>
+				</p>
+				<p>
+				{{#link-to 'users' class='btn btn-primary'}}Back{{/link-to}}
+				</p>
+			</div>
+		</div>
+		<div class="col-md-7">
+			{{outlet}}
+		</div>
+	</div>
+</script>
+<script type="text/x-handlebars" id="user/index">
+	<h5>Select any one of the below...</h5>
+	<ul>
+		<li>{{#link-to 'user.own_projects'}}Projects{{/link-to}} </li>
+		<li>{{#link-to 'user.tasks' }}Tasks{{/link-to}}</li>
+		<li>{{#link-to 'user.collaborate_projects' }}Collaborates{{/link-to}} </li>
+	</ul>
+</script>
+<script type="text/x-handlebars" id="user/tasks">
+	<ol class="breadcrumb">
+		<li>{{#link-to 'users'}}Users{{/link-to}}</li>
+		<li>{{#link-to 'user' user.id}}{{user.userName}}{{/link-to}}</li>
+		<li class="active">Tasks</li>
+	</ol>
+	<!--<span>List of tasks</span>-->
+	<ul>
+		{{#each}}
+			{{#link-to 'task' this.id  class='list-group-item'}}{{title}}{{/link-to}}
+		{{else}}
+			<p>No Tasks yet!</p>
+		{{/each}}
+	</ul>
+</script>
+<script type="text/x-handlebars" id="user/own_projects">
+	<ol class="breadcrumb">
+		<li>{{#link-to 'users'}}Users{{/link-to}}</li>
+		<li>{{#link-to 'user' user.id}}{{user.userName}}{{/link-to}}</li>
+		<li class="active">Own Projects</li>
+	</ol>
+	<!--<span>List of user own projects.</span>-->
+	<ul>
+		{{#each}}
+			{{#link-to 'project' this.id class='list-group-item'}}{{name}}{{/link-to}}
+		{{else}}
+			<p>No Projects yet!</p>
+		{{/each}}
+	</ul>
+</script>
+<script type="text/x-handlebars" id="user/collaborate_projects">
+	<ol class="breadcrumb">
+		<li>{{#link-to 'users'}}Users{{/link-to}}</li>
+		<li>{{#link-to 'user' user.id}}{{user.userName}}{{/link-to}}</li>
+		<li class="active">Collaborate Projects</li>
+	</ol>
+	<!--<span>List of user collaborate projects</span>-->
+	<ul>
+		{{#each}}
+			{{#link-to 'project' this.id  class='list-group-item'}}{{name}}{{/link-to}}
+		{{else}}
+			<p>No Projects yet!</p>
+		{{/each}}
+	</ul>
+</script>
+<script type="text/x-handlebars" id="projects">
+	<div class="row">
+	    <div class="col-md-3">
+		    {{#link-to 'projects.new' }} New Project{{/link-to}}
+		    <div class="well">
+				<ul class="list-group">
+					{{#each}}
+						{{#link-to 'project' this class='list-group-item'}} {{name}} {{/link-to}}
+					{{/each}}
+				</ul>
+		    </div>
+	    </div>
+		<div class="col-md-8">
+			{{outlet}}
+		</div>
+    </div>
+</script>
+<script type="text/x-handlebars" id="projects/index">
+  <div class="well">
+	  Select any one project.
+  </div>
+</script>
+<script type="text/x-handlebars" id="projects/new">
+	<form>
+		<div class="form-group">
+			<label for="name" class="form-label">Project Title :</label>
+			<!--{{input type='text' name='title' value=title class='form-control' placeholder="Enter summary"}}-->
+			{{view Ember.TextField class='form-control' valueBinding="name" id="name" placeholder="Project Title" required="true"}}
+		</div>
+		<div class="form-group">
+			<label for="keyname" class="form-label">Key Name :</label>
+			{{input type='text' name='keyname' id='keyname' class='form-control' value=key placeholder='ex: TM'}}
+		</div>
+		<!--<div class="form-group">-->
+			<!--<label class="label-control" for="priority">Priority :</label>-->
+			<!--{{view Ember.Select content=priorities value=priority class='form-control'}}-->
+		<!--</div>-->
+		<!--<div class="form-group">-->
+			<!--<label for="EstimatedTime" class="form-label">Estimate Time:</label>-->
+			<!--{{input type='text' name='EstimatedTime' id='EstimatedTime' class='form-control' value=estimatedTime placeholder='ex: 2h,1d'}}-->
+		<!--</div>-->
+		<div class="form-group">
+			<label for="description">Description :</label>
+			<!--<textarea name="description" class="form-control" value="description"></textarea>-->
+			{{textarea name='description' class='form-control' value=description}}
+		</div>
+		<div class="form-group">
+			<input type="button" class='btn btn-primary' value="Create" {{action 'createProject'}}/>
+			<input type="reset" class="btn btn-primary" value="Cancel" {{action 'cancel'}}/>
+		</div>
+	</form>
+</script>
+<script type="text/x-handlebars" id="project">
+	<div class="well">
+		<div class="button-group">
+			{{#link-to 'project.index' this class='btn btn-primary'}}Overview{{/link-to}}
+			{{#link-to 'project.tasks' this class='btn btn-primary'}}Tasks{{/link-to}}
+		</div>
+		<div>
+			{{outlet}}
+		</div>
+	</div>
+</script>
+<script type="text/x-handlebars" id="project/index">
+	{{#link-to 'project.edit' this }}Edit{{/link-to}}
+	<label for="projectname">Project Name: </label> {{name}}
+</script>
+<script type="text/x-handlebars" id="project/tasks">
+<div class="well">
+	<!--<p> Project : {{name}} </p>-->
+	{{#link-to 'project.new_task'}}Create Task{{/link-to}}
+   <ul class="list-group">
+	{{#each}}
+	   {{#link-to 'task' this classNames='list-group-item' tagName='li'}}{{title}}{{/link-to}}
+	   {{else}}
+	       <li><p><em>No Tasks yet!.</em></p></li>
+	{{/each}}
+   </ul>
+	<!--{{outlet}}-->
+</div>
+</script>
+<script type="text/x-handlebars" id="project/new_task">
+	<form>
+		<div class="form-group">
+			<label for="title" class="form-label">Summary :</label>
+			{{view Ember.TextField class='form-control' valueBinding="title" id="title" placeholder="Summary" required="true"}}
+		</div>
+		<div class="form-group">
+			<label for="CompletionDate" class="form-label">Due Date :</label>
+			{{input type='date' name='CompletionDate' id='CompletionDate' class='form-control' value=completionDate}}
+		</div>
+		<div class="form-group">
+			<label class="label-control" for="priority">Priority :</label>
+			{{view Ember.Select content=priorities value=priority class='form-control'}}
+		</div>
+		<div class="form-group">
+			<label for="EstimatedTime" class="form-label">Estimate Time:</label>
+			{{input type='text' name='EstimatedTime' id='EstimatedTime' class='form-control' value=estimatedTime placeholder='ex: 2h,1d'}}
+		</div>
+		<div class="form-group">
+			<label for="Description">Description :</label>
+			<!--<textarea name="description" class="form-control" value="description"></textarea>-->
+			{{textarea name='Description' id='Description' class='form-control' value=description}}
+		</div>
+		<div class="form-group">
+			<input type="button" class='btn btn-primary' value="Create" {{action 'createTask'}}/>
+			<input type="reset" class="btn btn-primary" value="Cancel" {{action 'cancel'}}/>
+		</div>
+	</form>
+</script>
+<script type="text/x-handlebars" id="project/edit">
+	<div class="well">
+		<form>
+			<label for="projectname">Project Name: </label>
+			{{input type='text' name='projectname' value=name}}
+			<br>
+			<button class="btn btn-primary" {{action 'updateProject'}}> Update </button>
+		</form>
+	</div>
+</script>
+<script type="text/x-handlebars" id="tasks">
+	<!--<div class="row">-->
+		<div class="col-md-5">
+			<div class="well">
+				<div>Tasks: {{tasksCount}}</div>
+				{{#if this.length}}
+					<ul class="list-group">
+						{{#each }}
+							{{#link-to 'task' this.id class='list-group-item'}} {{title}} {{/link-to}}
+						{{/each}}
+					</ul>
+				{{else}}
+					<div class="info"> No tasks yet!.</div>
+				{{/if}}
+			</div>
+		</div>
+		<div class="col-md-7">
+			{{outlet}}
+		</div>
+	<!--</div>-->
+</script>
+<script type="text/x-handlebars" id="tasks/index">
+	Select any one task.
+</script>
+
+<script type="text/x-handlebars" id="task/index">
+	<div class="panel panel-primary">
+		<div class="panel-heading">Task Details</div>
+		<div class="panel-body" id="taskDetails">
+			<h2 class="txt-info">{{ title }}</h2>
+			<div class="btn-group">
+				{{#link-to 'task.edit' this class="btn btn-primary" }}<span class="glyphicon glyphicon-pencil">Edit</span>{{/link-to}}
+				<button type="button" class="btn btn-primary" {{action 'resolveTask'}}>Resolve Task</button>
+			</div>
+			<div class="well">
+				<div>
+					<label>Priority :</label>
+					<span> {{ priority }}</span>
+				</div>
+				<div >
+					<label >Due Date :</label>
+					<span> {{ completionDate }}</span>
+				</div>
+				<div >
+					<label>Status :</label>
+					<span> {{ status }}</span>
+				</div>
+				<div>
+					<label>Description :</label>
+					<span> {{ description }}</span>
+				</div>
+				<div >
+					<label>Estimate Time :</label>
+					<span> {{estimatedTime }}</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--{{outlet}}-->
+</script>
+<script type="text/x-handlebars" id="task/edit">
+    <div class="well">
+	    <form>
+		    <div class="form-group">
+			    <label for="summary" class="form-label">Summary :</label>
+			    <!--{{view Ember.TextField class='form-control' valueBinding="title" id="title" placeholder="Summary" required="true"}}<br />-->
+			    {{input type='text' name='summary' value=title class='form-control' placeholder="Enter summary"}}
+		    </div>
+		    <div class="form-group">
+			    <label for="CompletionDate" class="form-label">Due Date :</label>
+			    {{input type='date' id='CompletionDate' class='form-control' value=completionDate}}
+		    </div>
+
+		    <div class="form-group">
+			    <label for="estimatedTime" class="form-label">Estimate Time:</label>
+			    {{input type='text' name='estimatedTime' class='form-control' value=estimatedTime placeholder='ex: 2h,1d'}}
+		    </div>
+		    <div class="form-group">
+			    <label for="description">Description :</label>
+			    {{textarea id='description' class='form-control' value=description}}
+		    </div>
+		    <div class="form-group">
+			    <input type="button" class='btn btn-primary' value="Update" {{action 'updateTask'}}/>
+			    <input type="button" class="btn btn-primary" value="Cancel" {{action 'cancel'}}/>
+		    </div>
+	    </form>
+    </div>
+</script>
+
+<script src="lib.min.js"></script>
+<script src="all.min.js"></script>
+</body>
+</html>

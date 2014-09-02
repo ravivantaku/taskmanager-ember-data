@@ -13,14 +13,21 @@
 		<nav class="nav navbar-inverse" role="navigation">
 			<div class="container-fluid">
 				<div class="navbar-header">
-					{{#link-to 'index' class="navbar-brand"}}Technoidentity TaskManger{{/link-to}}
+					{{#link-to 'index' class="navbar-brand"}}Technoidentity TaskManager{{/link-to}}
 				</div>
 				<ul class="nav navbar-nav navbar-right">
-					<li>{{#link-to 'tasks' this.id class='btn'}}Tasks{{/link-to}}</li>
-					<li>{{#link-to 'projects' this.id class='btn' }}Projects{{/link-to}}</li>
-					<li><div>
-						Welcome <b><span>{{userName}}</span></b>
-					</div></li>
+					{{#if isAuthenticated}}
+					<li>{{#link-to 'tasks' user.userName class='btn'}}Tasks{{/link-to}}</li>
+					<li>{{#link-to 'projects' user.userName class='btn' }}Projects{{/link-to}}</li>
+					<li>
+						<div>
+							Welcome <b><span>{{user.userName}}</span></b>
+						</div>
+					</li>
+					<li><a href="#" {{action logout}}>Logout</a></li>
+					{{else}}
+					<li>{{#link-to 'login'}}Login{{/link-to}}</li>
+					{{/if}}
 				</ul>
 			</div>
 		</nav>
@@ -72,6 +79,7 @@
 				<h4><b>Users List :</b></h4>
 				<ul class="list-group">
 					{{#each}}
+					{{name}}
 						{{#link-to 'user' this class='list-group-item'}}{{userName}}{{/link-to}}
 					{{/each}}
 				</ul>

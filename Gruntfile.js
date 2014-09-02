@@ -34,7 +34,7 @@ module.exports = function(grunt){
             },
             combined: {
                 files: {
-                    'build/js/all.min.js': ['src/scripts/**/app.coffee','src/scripts/**/route.coffee','src/scripts/**/projects_model.coffee', 'src/scripts/**/!(app,route,projects_model)*.coffee']
+                    'build/js/all.min.js': ['src/scripts/**/app.coffee','src/scripts/**/route.coffee','src/scripts/**/app_model.coffee', 'src/scripts/**/!(app,route,projects_model)*.coffee']
                 }
             }
         },

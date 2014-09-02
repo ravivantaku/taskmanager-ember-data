@@ -2,7 +2,7 @@
 TM.ApplicationStore = DS.Store.extend
 	adapter: DS.RESTAdapter
 TM.ApplicationAdapter = DS.RESTAdapter.reopen
-	host: 'http://192.168.0.105'
+	host: 'http://202.153.45.8' # 'http://192.168.0.169'
 	namespace: 'taskmanagement'
 	headers:( ()->
 		{
@@ -15,35 +15,33 @@ TM.Project = DS.Model.extend
 	name: DS.attr 'string'
 	projectId: DS.attr 'string'
 	description: DS.attr 'string'
-	owner: DS.attr 'string'
+	owner: DS.attr()
 #	createdAt: DS.attr 'date', {defaultValue: new Date() }
-	ownerId: DS.belongsTo 'user', {async:true,inverse: 'projects'}
-	tasks: DS.hasMany 'task', {async:true}
+	ownerId: DS.belongsTo 'user', {async:true}
+#	tasks: DS.hasMany 'task', {async:true}
 	colabrators: DS.hasMany 'user', {async:true}
 
-TM.User = DS.Model.extend
-	projectsOwn : DS.hasMany 'project', {async:true},
-	collaborateProjects: DS.hasMany 'project', {async:true},
-	tasks: DS.hasMany 'task', {async:true},
-	email: DS.attr('string'),
-	emailConfirmed: DS.attr('boolean'),
-	phoneNumber: DS.attr('string'),
-	phoneNumberConfirmed: DS.attr('boolean'),
-	accessFailedCount: 0,
-	roles: [],
-	claims: [],
-	logins: [],
-	userName: DS.attr('string')
 #TM.User = DS.Model.extend
-#	userName: DS.attr 'string'
+#	userName: DS.attr('string')
+#	projects : DS.hasMany 'project', {async:true},
+##	collaborateProjects: DS.hasMany 'project', {async:true},
+#	tasks: DS.hasMany 'task', {async:true},
+#	email: DS.attr('string'),
+##	emailConfirmed: DS.attr('boolean'),
+#	phoneNumber: DS.attr('string'),
+##	phoneNumberConfirmed: DS.attr('boolean'),
+##	accessFailedCount: 0,
+
+TM.User = DS.Model.extend
+	userName: DS.attr 'string'
 #	createdAt: DS.attr 'date'
 #	isAdmin: DS.attr 'boolean'
 #	location: DS.attr 'string'
-#	email: DS.attr 'string'
-#	phoneNumber: DS.attr 'string'
-#	projects: DS.hasMany 'project', {async:true}
+	email: DS.attr 'string'
+	phoneNumber: DS.attr 'string'
+	projectsOwn: DS.hasMany 'project', {async:true, inverse: 'ownerId'}
 #	collaborateProjects: DS.hasMany 'project', {async:true}
-#	tasks: DS.hasMany 'task', {async:true}
+	tasks: DS.hasMany 'task', {async:true}
 
 TM.Task = DS.Model.extend 
 	title: DS.attr 'string'
@@ -58,19 +56,58 @@ TM.Task = DS.Model.extend
 	project: DS.belongsTo 'project', {async:true}
 
 TM.ProjectSerializer = DS.RESTSerializer.extend
-	extractArray: (store,type,payload)->
+	extractArray: (store, type, payload)->
+		console.log payload
 		projects = []
 		_.each payload, (item)->
 			item.id = item.projectId
 			projects.push item
-		projects
-TM.TasksSerializer = DS.RESTSerializer.extend
+		payload = {projects: projects}
+		this._super(store, type, payload)
+#	serialize: (record, options)->
+#		json = {
+#			name: record.get 'name'
+#			description: record.get 'description'
+#			projectId: record.get 'projectId'
+#			owner: null
+#			ownerId : record.get 'ownerId'
+#			colabrators: record.get 'colabrators'
+#		}
+#		record.eachAttribute (name)->
+#			json[name.underscore()] = record.get(name)
+#		record.eachRelationship((name, relationship) ->
+#			if(relationship.kind == 'hasMany')
+#				key = name.singularize().underscore() + '_ids'
+#				json[key] = record.get(name).mapBy('id')
+#		  else
+#				key = name.underscore() + '_id'
+#				json[key] = record.get(name + '.id') )
+#		if (options && options.includeId)
+#				json.id = record.get('id')
+#		console.log json
+#		json
+TM.TaskSerializer = DS.RESTSerializer.extend
 	extractArray: (store,type,payload)->
 		tasks = []
 		_.each payload, (item)->
-			item.id = item.projectId
 			tasks.push item
-		tasks
+		payload = {tasks: tasks}
+		this._super(store, type, payload)
+TM.UserSerializer = DS.RESTSerializer.extend
+	extractSingle: (store, type, payload, id)->
+		payload = {user: payload}
+		this._super(store, type, payload, id)
+	extractArray: (store,type,payload)->
+		users = []
+		_.each payload, (item)->
+			users.push item
+		payload = {users: users}
+		this._super(store, type, payload)
+#	serializeHasMany: (record, json, relationship)->
+#		key = relationship.key
+#		relationshipType = DS.RelationshipChange.determineRelationshipType(record.constructor, relationship)
+#		if (relationshipType == 'manyToNone' || relationshipType == 'manyToMany' || relationshipType == 'manyToOne')
+#			json[key] = Ember.get(record, key).mapBy('id');
 #TM.Project.FIXTURES = _.map _.range(20), (value)->
 #		id: value + 1
 #		name: faker.Name.firstName() + faker.Name.lastName()

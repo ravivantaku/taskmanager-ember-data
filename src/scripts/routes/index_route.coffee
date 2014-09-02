@@ -1,4 +1,4 @@
 TM.IndexRoute = Ember.Route.extend
 	model: ()->
-		user = @modelFor 'application'
-		@transitionTo 'projects', user.id
+#		user = @modelFor 'application'
+		@transitionTo 'login'

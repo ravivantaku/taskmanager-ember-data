@@ -1,4 +1,5 @@
 TM.Router.map ->
+	@resource 'login'
 	@resource 'users', ->
 		@route 'new'
 	@resource 'user', {path: '/users/:user_id'}, ->

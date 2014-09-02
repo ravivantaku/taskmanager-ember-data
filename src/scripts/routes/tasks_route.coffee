@@ -1,4 +1,4 @@
-TM.TasksRoute = Ember.Route.extend
+TM.TasksRoute = TM.AuthenticatedRoute.extend
 	model: (params)-> @store.find('task').then (result)->
 		console.log result
 		result

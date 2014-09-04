@@ -2,7 +2,7 @@
 TM.ApplicationStore = DS.Store.extend
 	adapter: DS.RESTAdapter
 TM.ApplicationAdapter = DS.RESTAdapter.reopen
-	host: 'http://202.153.45.8' # 'http://192.168.0.169'
+	host: 'http://202.153.45.8'
 	namespace: 'taskmanagement'
 	headers:( ()->
 		{
@@ -57,7 +57,6 @@ TM.Task = DS.Model.extend
 
 TM.ProjectSerializer = DS.RESTSerializer.extend
 	extractArray: (store, type, payload)->
-		console.log payload
 		projects = []
 		_.each payload, (item)->
 			item.id = item.projectId
@@ -65,27 +64,9 @@ TM.ProjectSerializer = DS.RESTSerializer.extend
 		payload = {projects: projects}
 		this._super(store, type, payload)
 #	serialize: (record, options)->
-#		json = {
-#			name: record.get 'name'
-#			description: record.get 'description'
-#			projectId: record.get 'projectId'
-#			owner: null
-#			ownerId : record.get 'ownerId'
-#			colabrators: record.get 'colabrators'
-#		}
-#		record.eachAttribute (name)->
-#			json[name.underscore()] = record.get(name)
-#		record.eachRelationship((name, relationship) ->
-#			if(relationship.kind == 'hasMany')
-#				key = name.singularize().underscore() + '_ids'
-#				json[key] = record.get(name).mapBy('id')
-#		  else
-#				key = name.underscore() + '_id'
-#				json[key] = record.get(name + '.id') )
-#		if (options && options.includeId)
-#				json.id = record.get('id')
-#		console.log json
-#		json
+#		this._super(record, options)
+	serializeIntoHash: (data,type,record,options)->
+		Ember.merge(data, this.serialize(record, options))
 TM.TaskSerializer = DS.RESTSerializer.extend
 	extractArray: (store,type,payload)->
 		tasks = []
